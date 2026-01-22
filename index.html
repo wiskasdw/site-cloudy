@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLOUDY - График работы и заказы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #5D3FD3; /* Фиолетовый - цвет вейпшопа */
+            --secondary-color: #9D4EDD;
+            --accent-color: #FF6B6B;
+            --light-color: #F8F9FA;
+            --success-color: #4CAF50;
+            --warning-color: #FFA726;
+            --info-color: #29B6F6;
+            --dark-color: #1A1A2E;
+            --border-radius: 12px;
+            --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Хедер для CLOUDY */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(93, 63, 211, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.3);
+            color: var(--primary-color);
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 3px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #ff4757 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* Кнопки */
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 6px 15px rgba(93, 63, 211, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(93, 63, 211, 0.5);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #2E7D32 100%);
+            color: white;
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.5);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #ff4757 100%);
+            color: white;
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+            color: white;
+            box-shadow: 0 6px 15px rgba(255, 167, 38, 0.4);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 167, 38, 0.5);
+        }
+        
+        .btn-logout {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-3px);
+        }
+        
+        /* Основной контент */
+        main {
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        
+        .section-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Управление графиком */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .employee-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .employee-input label {
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .employee-input input {
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background: #fafafa;
+        }
+        
+        .employee-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.1);
+            background: white;
+        }
+        
+        /* Навигация по неделям */
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(93, 63, 211, 0.1);
+        }
+        
+        .current-week {
+            font-weight: bold;
+            font-size: 20px;
+            color: var(--primary-color);
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 20px;
+        }
+        
+        .today-indicator {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(255, 167, 38, 0.4);
+        }
+        
+        /* Таблица графика */
+        .schedule-container {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            border: 1px solid rgba(93, 63, 211, 0.1);
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+        }
+        
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .schedule-table thead th {
+            background: #f8f9fa;
+            color: var(--primary-color);
+            padding: 20px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .schedule-table tbody td {
+            padding: 20px 15px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .employee-cell {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: left;
+            min-width: 200px;
+        }
+        
+        .shift {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            display: inline-block;
+            min-width: 140px;
+            transition: var(--transition);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .shift-work {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 1px solid #b1dfbb;
+        }
+        
+        .shift-dayoff {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 1px solid #f1b0b7;
+        }
+        
+        /* Форма заказа */
+        .order-form-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .order-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-control {
+            padding: 15px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background: #fafafa;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.1);
+            background: white;
+        }
+        
+        /* Таблица заказов */
+        .orders-container {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .orders-table thead th {
+            background: #f8f9fa;
+            color: var(--primary-color);
+            padding: 20px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .orders-table tbody td {
+            padding: 20px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 110px;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-processing {
+            background: linear-gradient(135deg, #cce5ff 0%, #b8daff 100%);
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        
+        .status-completed {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-cancelled {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Футер */
+        footer {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .week-navigation {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-table {
+                font-size: 14px;
+            }
+            
+            .shift {
+                min-width: 100px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Загрузка -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Загрузка...</div>
+    </div>
+
+    <!-- Хедер -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">CLOUDY VAPE SHOP</div>
+                    <div class="logo-subtitle">Работаем с 10:00 до 22:00 | График 2/2</div>
+                </div>
+            </div>
+            <div class="auth-section">
+                <div class="user-info" id="user-info"></div>
+                <button class="btn btn-primary" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Войти</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Модальное окно входа -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-lock"></i>
+                    Вход администратора CLOUDY
+                </h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="login-form" id="login-form">
+                    <div class="form-group">
+                        <label for="username"><i class="fas fa-user"></i> Логин</label>
+                        <input type="text" id="username" class="form-control" placeholder="Введите логин" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-key"></i> Пароль</label>
+                        <input type="password" id="password" class="form-control" placeholder="Введите пароль" required>
+                    </div>
+                    
+                    <div class="demo-credentials">
+                        <div class="demo-title">
+                            <i class="fas fa-info-circle"></i>
+                            Тестовый доступ:
+                        </div>
+                        <div class="demo-item">
+                            <span class="demo-label">Администратор:</span>
+                            <span class="demo-value">admin / cloudy123</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Войти как администратор
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="container">
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <!-- Основное содержимое -->
+    <main class="container">
+        <!-- Вкладки -->
+        <div class="tabs">
+            <div class="tab active" data-tab="schedule">
+                <i class="fas fa-calendar-week"></i>
+                График работы
+            </div>
+            <div class="tab" data-tab="orders">
+                <i class="fas fa-shopping-cart"></i>
+                Заказы товаров
+            </div>
+            <div class="tab" data-tab="products">
+                <i class="fas fa-box"></i>
+                Товары
+            </div>
+        </div>
+
+        <!-- График работы -->
+        <div class="tab-content active" id="schedule-tab">
+            <div class="section-container">
+                <h2 class="section-title">
+                    <i class="fas fa-calendar-week"></i>
+                    График работы сотрудников CLOUDY
+                </h2>
+                
+                <!-- Панель управления -->
+                <div class="dashboard-cards" id="admin-controls" style="display: none;">
+                    <div class="dashboard-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-users" style="color: var(--primary-color);"></i>
+                            Сотрудники вейпшопа
+                        </h3>
+                        <div class="employee-input">
+                            <label for="employee1">
+                                <i class="fas fa-user"></i>
+                                Рогожин Артём:
+                            </label>
+                            <input type="text" id="employee1" value="Рогожин Артём" class="form-control">
+                        </div>
+                        <div class="employee-input">
+                            <label for="employee2">
+                                <i class="fas fa-user"></i>
+                                Богдан Романюк:
+                            </label>
+                            <input type="text" id="employee2" value="Богдан Романюк" class="form-control">
+                        </div>
+                        <button class="btn btn-primary" id="update-names" style="width: 100%;">
+                            <i class="fas fa-sync-alt"></i>
+                            Обновить имена
+                        </button>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-cog" style="color: var(--primary-color);"></i>
+                            Управление графиком
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                            <button class="btn btn-primary" id="apply-2-2">
+                                <i class="fas fa-calendar-alt"></i>
+                                Применить график 2/2
+                            </button>
+                            <button class="btn btn-warning" id="swap-shifts">
+                                <i class="fas fa-exchange-alt"></i>
+                                Поменять смены (форс-мажор)
+                            </button>
+                            <button class="btn btn-danger" id="emergency-mode">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Режим форс-мажора
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar" style="color: var(--primary-color);"></i>
+                            Статистика месяца
+                        </h3>
+                        <div id="month-stats">
+                            <div style="text-align: center; padding: 20px; color: #666;">
+                                <i class="fas fa-chart-pie fa-2x"></i>
+                                <p style="margin-top: 10px;">Рабочих дней в месяце: 15</p>
+                                <p>Выходных дней: 15</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Навигация -->
+                <div class="week-navigation">
+                    <button class="btn btn-primary" id="prev-week">
+                        <i class="fas fa-chevron-left"></i>
+                        Предыдущая неделя
+                    </button>
+                    
+                    <div class="current-week" id="current-week"></div>
+                    
+                    <div class="week-info">
+                        <span class="today-indicator" id="today-indicator">
+                            <i class="fas fa-calendar-check"></i>
+                            Сегодня
+                        </span>
+                        <button class="btn btn-success" id="save-schedule" style="display: none;">
+                            <i class="fas fa-save"></i>
+                            Сохранить график
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="next-week">
+                        Следующая неделя
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Таблица графика -->
+                <div class="schedule-container">
+                    <div class="table-header">
+                        <h3 style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-table"></i>
+                            График работы на неделю
+                        </h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="schedule-table" id="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>Сотрудник</th>
+                                    <th>Понедельник</th>
+                                    <th>Вторник</th>
+                                    <th>Среда</th>
+                                    <th>Четверг</th>
+                                    <th>Пятница</th>
+                                    <th>Суббота</th>
+                                    <th>Воскресенье</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Сообщение о недоступности -->
+                <div class="access-denied" id="schedule-access-denied" style="display: none; text-align: center; padding: 40px;">
+                    <div style="font-size: 60px; color: #dee2e6; margin-bottom: 20px;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 style="color: var(--primary-color);">Только для администратора</h3>
+                    <p style="color: #666; margin-top: 10px;">Для изменения графика работы войдите как администратор</p>
+                    <button class="btn btn-primary" id="login-from-schedule" style="margin-top: 20px;">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Войти как администратор
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Заказы -->
+        <div class="tab-content" id="orders-tab">
+            <div class="section-container">
+                <h2 class="section-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Заказы товаров CLOUDY
+                </h2>
+                
+                <!-- Форма заказа -->
+                <div class="order-form-container">
+                    <h3 style="font-size: 22px; color: var(--primary-color); margin-bottom: 25px; display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-plus-circle"></i>
+                        Оформление заказа
+                    </h3>
+                    <form class="order-form-grid" id="order-form">
+                        <div class="form-group">
+                            <label for="customer-name">
+                                <i class="fas fa-user"></i>
+                                Ваше имя *
+                            </label>
+                            <input type="text" id="customer-name" class="form-control" placeholder="Иван Иванов" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customer-phone">
+                                <i class="fas fa-phone"></i>
+                                Телефон *
+                            </label>
+                            <input type="tel" id="customer-phone" class="form-control" placeholder="+7 (999) 123-45-67" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="order-product">
+                                <i class="fas fa-box"></i>
+                                Товар *
+                            </label>
+                            <select id="order-product" class="form-control" required>
+                                <option value="">Выберите товар</option>
+                                <option value="vape-mod">Vape мод</option>
+                                <option value="atomizer">Атомайзер</option>
+                                <option value="liquid">Жидкость для парения</option>
+                                <option value="coil">Испаритель</option>
+                                <option value="battery">Аккумулятор</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="order-amount">
+                                <i class="fas fa-ruble-sign"></i>
+                                Сумма заказа
+                            </label>
+                            <input type="number" id="order-amount" class="form-control" placeholder="2000" min="0">
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="order-details">
+                                <i class="fas fa-comment"></i>
+                                Комментарий к заказу
+                            </label>
+                            <textarea id="order-details" class="form-control" placeholder="Опишите ваш заказ..." rows="3"></textarea>
+                        </div>
+                        
+                        <div style="grid-column: 1 / -1;">
+                            <button type="submit" class="btn btn-success" style="width: 100%;">
+                                <i class="fas fa-paper-plane"></i>
+                                Отправить заказ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Таблица заказов -->
+                <div class="orders-container">
+                    <div class="table-header">
+                        <h3 style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-list"></i>
+                            Активные заказы
+                        </h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="orders-table" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th width="80">ID</th>
+                                    <th width="200">Клиент</th>
+                                    <th width="150">Телефон</th>
+                                    <th width="150">Товар</th>
+                                    <th>Комментарий</th>
+                                    <th width="120">Дата</th>
+                                    <th width="140">Статус</th>
+                                    <th width="100" class="admin-column" style="display: none;">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Пагинация -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px;">
+                    <div style="color: #666; font-size: 14px;">
+                        Всего заказов: <span id="orders-total">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Товары -->
+        <div class="tab-content" id="products-tab">
+            <div class="section-container">
+                <h2 class="section-title">
+                    <i class="fas fa-box"></i>
+                    Каталог товаров CLOUDY
+                </h2>
+                
+                <div id="products-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+                        <!-- Товары будут загружаться здесь -->
+                    </div>
+                </div>
+                
+                <div class="access-denied" id="products-admin" style="display: none; text-align: center; padding: 40px;">
+                    <div style="font-size: 60px; color: #dee2e6; margin-bottom: 20px;">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3 style="color: var(--primary-color);">Управление товарами</h3>
+                    <p style="color: #666; margin-top: 10px;">Для добавления и редактирования товаров войдите как администратор</p>
+                    <button class="btn btn-primary" id="login-from-products" style="margin-top: 20px;">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Войти как администратор
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Футер -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    CLOUDY VAPE SHOP
+                </h4>
+                <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                    Лучший вейпшоп в городе. Широкий ассортимент жидкостей, устройств и аксессуаров для парения.
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 20px;">
+                    <i class="fas fa-clock"></i>
+                    Часы работы
+                </h4>
+                <div style="color: rgba(255, 255, 255, 0.8);">
+                    <div style="margin-bottom: 10px;">
+                        <strong>Ежедневно:</strong> 10:00 - 22:00
+                    </div>
+                    <div>
+                        <strong>Работаем без выходных</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 20px;">
+                    <i class="fas fa-phone"></i>
+                    Контакты
+                </h4>
+                <div style="color: rgba(255, 255, 255, 0.8);">
+                    <div style="margin-bottom: 10px;">
+                        <i class="fas fa-phone-alt"></i> +7 (XXX) XXX-XX-XX
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <i class="fas fa-map-marker-alt"></i> Адрес вашего магазина
+                    </div>
+                    <div>
+                        <i class="fas fa-envelope"></i> info@cloudy-vape.ru
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; padding-top: 30px; margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.6);">
+            <p>&copy; 2024 CLOUDY VAPE SHOP. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ======================
+        // ОСНОВНЫЕ ДАННЫЕ И НАСТРОЙКИ
+        // ======================
+        
+        let currentUser = null;
+        let isAdmin = false;
+        let employees = ['Рогожин Артём', 'Богдан Романюк'];
+        let currentWeekOffset = 0;
+        let orders = [];
+        let products = [];
+        let scheduleHistory = {};
+        
+        // Инициализация данных
+        function initData() {
+            // Инициализируем график 2/2
+            generateSchedule();
+            
+            // Инициализируем заказы
+            orders = [
+                {
+                    id: 1,
+                    customerName: 'Иван Петров',
+                    phone: '+7 (999) 123-45-67',
+                    product: 'Vape мод',
+                    amount: 3500,
+                    details: 'Нужен мощный мод для DTL',
+                    date: new Date().toLocaleDateString('ru-RU'),
+                    status: 'processing'
+                },
+                {
+                    id: 2,
+                    customerName: 'Анна Сидорова',
+                    phone: '+7 (999) 987-65-43',
+                    product: 'Жидкость для парения',
+                    amount: 800,
+                    details: 'Ищу жидкость с табачным вкусом',
+                    date: new Date().toLocaleDateString('ru-RU'),
+                    status: 'pending'
+                }
+            ];
+            
+            // Инициализируем товары
+            products = [
+                { id: 1, name: 'Vape мод', price: 2500, category: 'Устройства', stock: 5 },
+                { id: 2, name: 'Атомайзер', price: 1200, category: 'Устройства', stock: 8 },
+                { id: 3, name: 'Жидкость для парения', price: 500, category: 'Жидкости', stock: 20 },
+                { id: 4, name: 'Испаритель', price: 300, category: 'Расходники', stock: 15 },
+                { id: 5, name: 'Аккумулятор 18650', price: 800, category: 'Аксессуары', stock: 10 }
+            ];
+        }
+        
+        // ======================
+        // СИСТЕМА ГРАФИКА 2/2
+        // ======================
+        
+        function generateSchedule() {
+            const pattern = ['work', 'work', 'dayoff', 'dayoff'];
+            const weekKey = `week_${currentWeekOffset}`;
+            
+            // Если график уже существует, не перезаписываем
+            if (scheduleHistory[weekKey]) return;
+            
+            const schedule = {};
+            employees.forEach((employee, empIndex) => {
+                schedule[employee] = {};
+                let patternStart = empIndex * 2;
+                
+                for (let day = 0; day < 7; day++) {
+                    const patternIndex = (patternStart + day) % pattern.length;
+                    const dayType = pattern[patternIndex];
+                    
+                    schedule[employee][day] = {
+                        shift: dayType === 'work' ? 'Работает' : 'Выходной',
+                        class: dayType === 'work' ? 'shift-work' : 'shift-dayoff',
+                        dayType: dayType
+                    };
+                }
+            });
+            
+            scheduleHistory[weekKey] = schedule;
+        }
+        
+        // ======================
+        // ФУНКЦИИ ИНТЕРФЕЙСА
+        // ======================
+        
+        function updateUIForUser() {
+            const adminControls = document.getElementById('admin-controls');
+            const scheduleAccessDenied = document.getElementById('schedule-access-denied');
+            const saveScheduleBtn = document.getElementById('save-schedule');
+            const adminColumns = document.querySelectorAll('.admin-column');
+            const productsAdmin = document.getElementById('products-admin');
+            const todayIndicator = document.getElementById('today-indicator');
+            
+            // Показываем/скрываем сегодняшний индикатор
+            const weekDates = getWeekDates(currentWeekOffset);
+            const isCurrentWeek = isDateInThisWeek(new Date(), weekDates);
+            if (todayIndicator) {
+                todayIndicator.style.display = isCurrentWeek ? 'inline-flex' : 'none';
+            }
+            
+            if (isAdmin) {
+                // Администратор
+                if (adminControls) adminControls.style.display = 'grid';
+                if (scheduleAccessDenied) scheduleAccessDenied.style.display = 'none';
+                if (saveScheduleBtn) saveScheduleBtn.style.display = 'inline-flex';
+                adminColumns.forEach(col => col.style.display = 'table-cell');
+                if (productsAdmin) productsAdmin.style.display = 'none';
+            } else if (currentUser) {
+                // Обычный пользователь
+                if (adminControls) adminControls.style.display = 'none';
+                if (scheduleAccessDenied) scheduleAccessDenied.style.display = 'none';
+                if (saveScheduleBtn) saveScheduleBtn.style.display = 'none';
+                adminColumns.forEach(col => col.style.display = 'none');
+                if (productsAdmin) productsAdmin.style.display = 'block';
+            } else {
+                // Гость
+                if (adminControls) adminControls.style.display = 'none';
+                if (scheduleAccessDenied) scheduleAccessDenied.style.display = 'block';
+                if (saveScheduleBtn) saveScheduleBtn.style.display = 'none';
+                adminColumns.forEach(col => col.style.display = 'none');
+                if (productsAdmin) productsAdmin.style.display = 'none';
+            }
+            
+            updateUserInfo();
+            renderSchedule();
+            renderOrders();
+            renderProducts();
+            updateWeekDisplay();
+        }
+        
+        function updateUserInfo() {
+            const userInfoElement = document.getElementById('user-info');
+            const loginBtn = document.getElementById('login-btn');
+            
+            if (currentUser) {
+                userInfoElement.innerHTML = `
+                    <div class="user-avatar">${currentUser.charAt(0).toUpperCase()}</div>
+                    <span>${currentUser}</span>
+                    ${isAdmin ? '<span class="admin-badge">Админ</span>' : ''}
+                `;
+                loginBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i><span>Выйти</span>`;
+                loginBtn.classList.remove('btn-primary');
+                loginBtn.classList.add('btn-logout');
+            } else {
+                userInfoElement.innerHTML = '';
+                loginBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i><span>Войти</span>`;
+                loginBtn.classList.remove('btn-logout');
+                loginBtn.classList.add('btn-primary');
+            }
+        }
+        
+        function updateWeekDisplay() {
+            const weekDates = getWeekDates(currentWeekOffset);
+            const currentWeekElement = document.getElementById('current-week');
+            if (currentWeekElement) {
+                currentWeekElement.textContent = `Неделя: ${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`;
+            }
+        }
+        
+        // ======================
+        // ОТРИСОВКА ГРАФИКА
+        // ======================
+        
+        function renderSchedule() {
+            const scheduleBody = document.getElementById('schedule-body');
+            const weekDates = getWeekDates(currentWeekOffset);
+            const weekKey = `week_${currentWeekOffset}`;
+            
+            generateSchedule(); // Убедимся, что график существует
+            
+            let html = '';
+            employees.forEach(employee => {
+                html += `<tr>`;
+                html += `<td class="employee-cell"><strong>${employee}</strong></td>`;
+                
+                for (let day = 0; day < 7; day++) {
+                    const shiftData = scheduleHistory[weekKey][employee][day];
+                    const editableClass = isAdmin ? 'editable' : '';
+                    const todayClass = isToday(weekDates[day]) ? 'today' : '';
+                    
+                    html += `
+                        <td class="${editableClass} ${todayClass}" data-employee="${employee}" data-day="${day}">
+                            <div class="shift ${shiftData.class}">
+                                ${shiftData.shift}
+                                ${shiftData.dayType === 'work' ? '<span style="position: absolute; top: -8px; right: -8px; background: var(--accent-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px;">Р</span>' : 
+                                  '<span style="position: absolute; top: -8px; right: -8px; background: #666; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px;">В</span>'}
+                            </div>
+                            <div style="font-size: 13px; color: #666; margin-top: 8px;">
+                                ${weekDates[day].getDate()}.${weekDates[day].getMonth()+1}
+                                ${isToday(weekDates[day]) ? ' (сегодня)' : ''}
+                            </div>
+                        </td>
+                    `;
+                }
+                
+                html += `</tr>`;
+            });
+            
+            scheduleBody.innerHTML = html;
+            
+            // Добавляем обработчики для редактируемых ячеек
+            if (isAdmin) {
+                document.querySelectorAll('.editable').forEach(cell => {
+                    cell.addEventListener('click', handleCellClick);
+                });
+            }
+        }
+        
+        function handleCellClick(event) {
+            const cell = event.currentTarget;
+            const employee = cell.getAttribute('data-employee');
+            const day = parseInt(cell.getAttribute('data-day'));
+            const weekKey = `week_${currentWeekOffset}`;
+            
+            const currentShift = scheduleHistory[weekKey][employee][day];
+            const newShift = currentShift.shift === 'Работает' ? 'Выходной' : 'Работает';
+            const newClass = newShift === 'Работает' ? 'shift-work' : 'shift-dayoff';
+            const newDayType = newShift === 'Работает' ? 'work' : 'dayoff';
+            
+            scheduleHistory[weekKey][employee][day] = {
+                shift: newShift,
+                class: newClass,
+                dayType: newDayType
+            };
+            
+            renderSchedule();
+            showNotification(`Смена ${employee} изменена: ${newShift}`, 'success');
+        }
+        
+        // ======================
+        // ОТРИСОВКА ЗАКАЗОВ
+        // ======================
+        
+        function renderOrders() {
+            const ordersBody = document.getElementById('orders-body');
+            const ordersTotal = document.getElementById('orders-total');
+            
+            if (orders.length === 0) {
+                ordersBody.innerHTML = `
+                    <tr>
+                        <td colspan="${isAdmin ? 8 : 7}" style="text-align: center; padding: 40px; color: #666;">
+                            <div style="font-size: 40px; margin-bottom: 10px;">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <h3>Заказов пока нет</h3>
+                            <p>Будьте первым, кто оформит заказ!</p>
+                        </td>
+                    </tr>
+                `;
+                ordersTotal.textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            orders.forEach(order => {
+                const statusText = {
+                    'pending': 'Ожидает',
+                    'processing': 'В обработке',
+                    'completed': 'Завершен',
+                    'cancelled': 'Отменен'
+                };
+                
+                const statusClass = {
+                    'pending': 'status-pending',
+                    'processing': 'status-processing',
+                    'completed': 'status-completed',
+                    'cancelled': 'status-cancelled'
+                };
+                
+                html += `
+                    <tr>
+                        <td><strong>#${order.id}</strong></td>
+                        <td>${order.customerName}</td>
+                        <td>${order.phone}</td>
+                        <td>${order.product}</td>
+                        <td>${order.details || '—'}</td>
+                        <td>${order.date}</td>
+                        <td>
+                            <span class="status-badge ${statusClass[order.status]}">
+                                ${statusText[order.status]}
+                            </span>
+                        </td>
+                `;
+                
+                if (isAdmin) {
+                    html += `
+                        <td>
+                            <select class="action-btn status" data-id="${order.id}" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Ожидает</option>
+                                <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>В обработке</option>
+                                <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>Завершен</option>
+                                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Отменен</option>
+                            </select>
+                        </td>
+                    `;
+                }
+                
+                html += `</tr>`;
+            });
+            
+            ordersBody.innerHTML = html;
+            ordersTotal.textContent = orders.length;
+            
+            // Добавляем обработчики для администратора
+            if (isAdmin) {
+                document.querySelectorAll('.action-btn.status').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const orderId = parseInt(this.getAttribute('data-id'));
+                        updateOrderStatus(orderId, this.value);
+                    });
+                });
+            }
+        }
+        
+        // ======================
+        // ОТРИСОВКА ТОВАРОВ
+        // ======================
+        
+        function renderProducts() {
+            const productsContent = document.getElementById('products-content');
+            
+            let html = '';
+            products.forEach(product => {
+                html += `
+                    <div style="background: white; border-radius: var(--border-radius); padding: 20px; box-shadow: var(--box-shadow);">
+                        <div style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); width: 100%; height: 150px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                            <i class="fas fa-box" style="font-size: 50px; color: white;"></i>
+                        </div>
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">${product.name}</h4>
+                        <div style="color: #666; margin-bottom: 10px;">${product.category}</div>
+                        <div style="font-size: 20px; font-weight: bold; color: var(--primary-color); margin-bottom: 15px;">
+                            ${product.price} ₽
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 14px; color: ${product.stock > 5 ? 'var(--success-color)' : 'var(--warning-color)'}">
+                                ${product.stock} шт. в наличии
+                            </span>
+                            ${isAdmin ? `
+                                <button class="btn btn-primary btn-small edit-product" data-id="${product.id}" style="padding: 8px 16px; font-size: 14px;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Добавляем кнопку добавления товара для администратора
+            if (isAdmin) {
+                html += `
+                    <div style="background: white; border-radius: var(--border-radius); padding: 20px; box-shadow: var(--box-shadow); display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; cursor: pointer;" id="add-product">
+                        <div style="text-align: center;">
+                            <div style="font-size: 40px; color: var(--primary-color); margin-bottom: 10px;">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div style="color: var(--primary-color); font-weight: 600;">Добавить товар</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            productsContent.querySelector('div').innerHTML = html;
+            
+            if (isAdmin) {
+                document.getElementById('add-product')?.addEventListener('click', showAddProductModal);
+                document.querySelectorAll('.edit-product').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const productId = parseInt(this.getAttribute('data-id'));
+                        editProduct(productId);
+                    });
+                });
+            }
+        }
+        
+        // ======================
+        // ОСНОВНЫЕ ФУНКЦИИ
+        // ======================
+        
+        function login(username, password) {
+            // В продакшене здесь должна быть проверка на сервере
+            if (username === 'admin' && password === 'cloudy123') {
+                currentUser = 'Администратор';
+                isAdmin = true;
+                return true;
+            }
+            return false;
+        }
+        
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            updateUIForUser();
+            showNotification('Вы вышли из системы', 'success');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            
+            const icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                error: '<i class="fas fa-exclamation-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d1ecf1'}; color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#0c5460'}; border-radius: 8px; border-left: 5px solid ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#17a2b8'};">
+                    ${icons[type]}
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // ======================
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ======================
+        
+        function getWeekDates(weekOffset) {
+            const now = new Date();
+            const currentDay = now.getDay();
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - (currentDay === 0 ? 6 : currentDay - 1) + (weekOffset * 7));
+            
+            const weekDates = [];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                weekDates.push(date);
+            }
+            
+            return weekDates;
+        }
+        
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+        
+        function isDateInThisWeek(date, weekDates) {
+            return date >= weekDates[0] && date <= weekDates[6];
+        }
+        
+        function formatDate(date) {
+            const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            return `${date.getDate()} ${months[date.getMonth()]}`;
+        }
+        
+        // ======================
+        // ОБРАБОТЧИКИ СОБЫТИЙ
+        // ======================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initData();
+            updateUIForUser();
+            
+            // Обработчики вкладок
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Вход/выход
+            document.getElementById('login-btn').addEventListener('click', function() {
+                if (currentUser) {
+                    logout();
+                } else {
+                    document.getElementById('login-modal').classList.add('active');
+                }
+            });
+            
+            // Закрытие модального окна
+            document.getElementById('modal-close').addEventListener('click', function() {
+                document.getElementById('login-modal').classList.remove('active');
+            });
+            
+            document.getElementById('login-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+            
+            // Форма входа
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (login(username, password)) {
+                    document.getElementById('login-modal').classList.remove('active');
+                    this.reset();
+                    updateUIForUser();
+                    showNotification('Добро пожаловать, администратор!', 'success');
+                } else {
+                    showNotification('Неверный логин или пароль', 'error');
+                }
+            });
+            
+            // Кнопки входа из разных разделов
+            document.getElementById('login-from-schedule')?.addEventListener('click', function() {
+                document.getElementById('login-modal').classList.add('active');
+            });
+            
+            document.getElementById('login-from-products')?.addEventListener('click', function() {
+                document.getElementById('login-modal').classList.add('active');
+            });
+            
+            // Навигация по неделям
+            document.getElementById('prev-week').addEventListener('click', function() {
+                currentWeekOffset--;
+                updateUIForUser();
+            });
+            
+            document.getElementById('next-week').addEventListener('click', function() {
+                currentWeekOffset++;
+                updateUIForUser();
+            });
+            
+            // Сохранение графика
+            document.getElementById('save-schedule').addEventListener('click', function() {
+                // Здесь будет отправка на сервер
+                showNotification('График сохранен!', 'success');
+            });
+            
+            // Обновление имен сотрудников
+            document.getElementById('update-names').addEventListener('click', function() {
+                const emp1 = document.getElementById('employee1').value.trim();
+                const emp2 = document.getElementById('employee2').value.trim();
+                
+                if (!emp1 || !emp2) {
+                    showNotification('Имена сотрудников не могут быть пустыми', 'error');
+                    return;
+                }
+                
+                // Обновляем графики под новыми именами
+                const oldEmployees = [...employees];
+                employees = [emp1, emp2];
+                
+                // Переносим графики
+                Object.keys(scheduleHistory).forEach(weekKey => {
+                    const oldSchedule = scheduleHistory[weekKey];
+                    const newSchedule = {};
+                    
+                    employees.forEach((newEmp, index) => {
+                        const oldEmp = oldEmployees[index];
+                        newSchedule[newEmp] = oldSchedule[oldEmp] || {};
+                    });
+                    
+                    scheduleHistory[weekKey] = newSchedule;
+                });
+                
+                updateUIForUser();
+                showNotification('Имена сотрудников обновлены', 'success');
+            });
+            
+            // Применение графика 2/2
+            document.getElementById('apply-2-2').addEventListener('click', function() {
+                const weekKey = `week_${currentWeekOffset}`;
+                delete scheduleHistory[weekKey];
+                generateSchedule();
+                renderSchedule();
+                showNotification('График 2/2 применен', 'success');
+            });
+            
+            // Поменять смены местами
+            document.getElementById('swap-shifts').addEventListener('click', function() {
+                const weekKey = `week_${currentWeekOffset}`;
+                const schedule = scheduleHistory[weekKey];
+                
+                Object.keys(schedule).forEach(employee => {
+                    for (let day = 0; day < 7; day++) {
+                        const current = schedule[employee][day];
+                        schedule[employee][day] = {
+                            shift: current.shift === 'Работает' ? 'Выходной' : 'Работает',
+                            class: current.shift === 'Работает' ? 'shift-dayoff' : 'shift-work',
+                            dayType: current.dayType === 'work' ? 'dayoff' : 'work'
+                        };
+                    }
+                });
+                
+                renderSchedule();
+                showNotification('Смены поменяны местами', 'success');
+            });
+            
+            // Режим форс-мажора
+            document.getElementById('emergency-mode').addEventListener('click', function() {
+                const weekKey = `week_${currentWeekOffset}`;
+                const schedule = scheduleHistory[weekKey];
+                
+                // В режиме форс-мажора оба сотрудника работают каждый день
+                Object.keys(schedule).forEach(employee => {
+                    for (let day = 0; day < 7; day++) {
+                        schedule[employee][day] = {
+                            shift: 'Работает',
+                            class: 'shift-work',
+                            dayType: 'work'
+                        };
+                    }
+                });
+                
+                renderSchedule();
+                showNotification('Режим форс-мажора активирован', 'warning');
+            });
+            
+            // Форма заказа
+            document.getElementById('order-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const customerName = document.getElementById('customer-name').value.trim();
+                const phone = document.getElementById('customer-phone').value.trim();
+                const product = document.getElementById('order-product').value;
+                const amount = document.getElementById('order-amount').value;
+                const details = document.getElementById('order-details').value.trim();
+                
+                if (!customerName || !phone || !product) {
+                    showNotification('Заполните обязательные поля', 'error');
+                    return;
+                }
+                
+                const newOrder = {
+                    id: orders.length + 1,
+                    customerName,
+                    phone,
+                    product,
+                    amount: amount || 0,
+                    details,
+                    date: new Date().toLocaleDateString('ru-RU'),
+                    status: 'pending'
+                };
+                
+                orders.unshift(newOrder);
+                renderOrders();
+                this.reset();
+                
+                showNotification('Заказ успешно оформлен!', 'success');
+                
+                // Переходим на вкладку заказов
+                document.querySelector('.tab[data-tab="orders"]').click();
+            });
+            
+            // Обновление статуса заказа
+            window.updateOrderStatus = function(orderId, newStatus) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = newStatus;
+                    renderOrders();
+                    showNotification(`Статус заказа #${orderId} изменен`, 'success');
+                }
+            };
+        });
+    </script>
+</body>
+</html>
